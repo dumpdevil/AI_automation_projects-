@@ -1,0 +1,541 @@
+{
+  "name": "appoinment_booking_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "failed"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        192
+      ],
+      "id": "6f422a44-9291-48ea-b64a-a70704d8c2aa",
+      "name": "WhatsApp Trigger",
+      "webhookId": "0523f880-78c6-4a16-99d2-043166e7c23b",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "wCD5ayygTyCAZrG0",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        496,
+        192
+      ],
+      "id": "85d0da08-43f1-4d4c-9945-c188f2d7d14b",
+      "name": "Send message",
+      "webhookId": "582e3bae-41ac-41cf-bd5d-d1ebd7389d5b",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "52xzBu2siT86AEOD",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "contextWindowLength": 12
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        16
+      ],
+      "id": "746b4f89-fde7-44f1-80f3-007ab18dd667",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1LP8SoC1qKDz01-8SdqcbZlISDDFVioQjtMR7Fjl2n54",
+          "mode": "list",
+          "cachedResultName": "appoinment _details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LP8SoC1qKDz01-8SdqcbZlISDDFVioQjtMR7Fjl2n54/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LP8SoC1qKDz01-8SdqcbZlISDDFVioQjtMR7Fjl2n54/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fullname": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fullname', ``, 'string') }}",
+            "age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('age', ``, 'string') }}",
+            "gender": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('gender', ``, 'string') }}",
+            "purpose": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('purpose', ``, 'string') }}",
+            "department": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('department', ``, 'string') }}",
+            "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('date', ``, 'string') }}",
+            "timeslot": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('timeslot', ``, 'string') }}",
+            "moblie number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('moblie_number', ``, 'string') }}",
+            "booking-id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('booking-id', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fullname",
+              "displayName": "fullname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gender",
+              "displayName": "gender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "purpose",
+              "displayName": "purpose",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "department",
+              "displayName": "department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timeslot",
+              "displayName": "timeslot",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "moblie number",
+              "displayName": "moblie number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "booking-id",
+              "displayName": "booking-id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        -272,
+        400
+      ],
+      "id": "e2a42690-79f1-4343-b9d0-6ea573785bdb",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gVn2psDMVfYEPlDo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1cf9a9bf-d073-4428-9ce7-f030e95142ae",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "7cpsjCRsSVmJZEHg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "message_details",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "message_id",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].id }}"
+            },
+            {
+              "fieldId": "phone_number",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+            },
+            {
+              "fieldId": "user_message",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}"
+            },
+            {
+              "fieldId": "time_stamp",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].timestamp }}"
+            },
+            {
+              "fieldId": "Ai_reply",
+              "fieldValue": "={{ $('AI Agent').item.json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        752,
+        192
+      ],
+      "id": "4a0e89cc-b5a3-40b1-a9f3-ee3a1dfab626",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "TpUGoHMIhullgZnJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "message_details",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_number",
+              "condition": "eq",
+              "keyValue": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        480,
+        416
+      ],
+      "id": "e92b6e52-00e6-4191-871a-d7a71f12ab7c",
+      "name": "Get many rows in Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "TpUGoHMIhullgZnJ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "zapnix001@gmail.com",
+          "mode": "list",
+          "cachedResultName": "zapnix001@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', `appoinment summary`, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', `booking id`, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        400
+      ],
+      "id": "d69f8e0e-c9ad-4585-b979-1a19bcd746c5",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "9tNTeOQp0tPtqie6",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "= {{ $json.messages[0].text.body }}\n",
+        "options": {
+          "systemMessage": "=You are SanjeevanCare Assistant — a polite, warm, and helpful AI agent working for Sanjeevan Hospital. Your job is to help users:\n\n1. Book an appointment step-by-step\n2. Check doctor availability or appointment status\n3. Cancel or reschedule existing appointments\n4. Answer general hospital queries\n\nYou are deployed on WhatsApp and website chat, and connected to a backend workflow that logs all appointment details into Google Sheets and Google Calendar.\n\n--for getting context of past interaction fetch the supabase from which you will get pass interaction\n---\n-current date and time  is : {{ DateTime.now() }}\n\n🌟 APPOINTMENT BOOKING FLOW\n\nIf the user’s intent is to **book an appointment**, follow this step-by-step flow, asking ONE question at a time. Wait for the user’s answer before moving on.\n\n**Questions to ask, one at a time:**\n\n1. May I have your full name?\n2. Please share your age and gender.\n3. What’s the reason for your visit? (e.g., fever, consultation, follow-up)\n4. Is there a specific department or doctor you’d like to visit(detect the deparment based on reason or give suggestions)?\n5. Which date would you prefer for your appointment?(covert into Format -: DD/MM/YYYY )\n6. What time slot would suit you? check the \"availability\" google calender node(take only 1 booking at a given slot) and give all available slot for that day\nper days slot between:\nmorning:\n10:00am - 10:30am,\n10:30am -11:00am,\n11:00am- 11:30am,\n11:30am - 12:00pm.\n\nevening:\n6:00pm - 6:30 pm,\n6:30pm- 7:00 pm,\n7:00pm- 7:30 pm,\n7:30pm- 8:00 pm.\n\n).\n(Check availability all the time and give only the available time).\n7.please provide your email .\n8. Lastly, please share your 10-digit mobile number.\n  \ngenerate - Booking ID: SH-{{ $json.messages[0].timestamp }}\n-respond with a confirmation message\n\n**Confirmation message format:**\n✅ Your appointment has been booked!\n\n🆔 Booking ID: SH-{{ $json.messages[0].timestamp }}\n👤 Name: {{name}}  \n👨‍⚕️ Department/Doctor: {{doctor_or_department}}  \n📅 Date: {{date}} (Format -: DD/MM/YYYY)\n🕒 Time: {{time}}  \n📍 Sanjeevan Hospital\n-send an confirmation email to user with same summary(important).\n\n👉 After collecting all details,  and send the data to the google sheet for storage and calendar event creation also bookindg id.\n\nWe’ve also sent you a confirmation on WhatsApp. Get well soon! 💙\n\n---\n\n💡 OTHER INTENTS TO HANDLE:\n\n- **Doctor Availability:** Ask for the doctor or department name, then respond with availability or \"Let me check that for you.\"\n- **Appointment Status:** Ask for Booking ID or mobile number, then route to backend.\n- **Cancel/Reschedule:** Ask for Booking ID and requested change.\n- **Hospital Information:** If asked about timings, fees, address, services, or emergency support — respond with accurate and clear information.\n\n---\n\n🔒 If a user sends unclear or unrelated messages:\nReply kindly:\n“I'm here to help with appointments, doctor availability, and hospital-related questions. Could you tell me how I can assist you today? 😊”\n\n---\n\n✨ TONE:\n- Always friendly, calm, and professional\n- Use emojis gently for warmth 😊\n- Do NOT ask multiple questions in one message\n- Never guess — always ask clearly if a response is incomplete\n\n---never send same message again and again\n\n🔗 TECH INTEGRATION NOTES:\n- All appointment data will be sent to **Google Sheets**\n- An event will also be created in **Google Calendar**\n- Booking ID will be auto-generated \n\nYou are the smart, friendly bridge between Sanjeevan Hospital and its patients. Let’s help them now. ❤️"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        192
+      ],
+      "id": "86cf6ee5-286b-45e0-b23b-499563885be6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        416
+      ],
+      "id": "30e4304f-f9ab-4104-946d-4a373e61cc83",
+      "name": "send confirmation mail",
+      "webhookId": "9059cb68-9570-4c08-804e-694103ba0f67",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1nQl87AvVRZC8GYX",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "zapnix001@gmail.com",
+          "mode": "list",
+          "cachedResultName": "zapnix001@gmail.com"
+        },
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        416
+      ],
+      "id": "f44e6870-91a9-4f0a-b2e7-458a3efd4020",
+      "name": "availability",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "9tNTeOQp0tPtqie6",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send confirmation mail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

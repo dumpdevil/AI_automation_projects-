@@ -1,0 +1,687 @@
+{
+  "name": "Restarurent_calling_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d1bd29cb-159c-40f3-b549-e423e47dfad4",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -736,
+        432
+      ],
+      "id": "b1aebe36-e1aa-4f8c-b139-b5a8d4ed0b48",
+      "name": "Webhook",
+      "webhookId": "d1bd29cb-159c-40f3-b549-e423e47dfad4"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"{{ $json.output }}\"\n        }\n    ]\n}\n ",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1312,
+        368
+      ],
+      "id": "25decc0c-6730-40c9-aa9f-1dff8c75b1e8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=no user message just run system prompt.",
+        "options": {
+          "systemMessage": "=You are an AI assistant that helps manage table reservations for Hotel Zapnix through n8n.\n\nYour job is to:\n1. Check if a table is available at the requested date and time.\n2. If available:\n   - Update the number of available tables.\n   - Store the customer’s booking details.\n3. If not available:\n   - Respond that the requested time slot is fully booked.\n\n### Step-by-step Workflow:\n\n🔹 Input Parameters from the user:\n- name: {{ $json.body.message.toolCalls[0].function.arguments.Name }}\n- guests: {{ $json.body.message.toolCalls[0].function.arguments['Number Of Guest'] }}\n- date:{{ $json.body.message.toolCalls[0].function.arguments.Date }}  change the format to (DD-MM-YYYY) \n- time: {{ $json.body.message.toolCalls[0].function.arguments.Time }}\n*convert in 24 hours format if not\n- phone: 91{{ $json.body.message.toolCalls[0].function.arguments['Moblie Number'] }}\n- email: {{ $json.body.message.toolCalls[0].function.arguments.EMAIL }}\n-booking id: BK-{{ $json.body.message.timestamp }}\n\n---\n\n## LOGIC FLOW:\n\n1. **Check Table Availability** (`Node: check_availability`)\n   - Look up the availability object for the requested `time`\n   - if number of table > 0\n     - Proceed with booking\n   - Else:\n     - Respond: \"Sorry, no tables are available at that time.\"\n\n2. **Update Table Count** (`Node: update_availability`)\n   - number of table count decrement by 1 for the given time\n\n3. **Store Booking Details** (`Node: booking_details`)\n   - Save:\n     - name\n     - guests\n     - date\n     - time\n     - phone\n     - email (if provided)\n     - booking reference ID \nenter the details only once .if the sheet is updated then give output\n\n****give output as given only in only single line: \n-if all booking and all the summary is sent give output as \"success\"\n-if the slot is not available then give the output as \"slot is full\"\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        240
+      ],
+      "id": "ad9acb91-2458-4b3d-83ac-fba15a561c14",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        464
+      ],
+      "id": "5d3e6eb9-832b-4f22-9e1b-86acd0bbdb49",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "7cpsjCRsSVmJZEHg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1y9aLPw8Un5eUQhbqE3IHcccjGFS6fGRI01VDa6wrEeM",
+          "mode": "list",
+          "cachedResultName": "BOOKINGS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y9aLPw8Un5eUQhbqE3IHcccjGFS6fGRI01VDa6wrEeM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y9aLPw8Un5eUQhbqE3IHcccjGFS6fGRI01VDa6wrEeM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "BOOKING_ID": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('BOOKING_ID', ``, 'string') }}",
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+            "date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('date', ``, 'string') }}",
+            "time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('time', ``, 'string') }}",
+            "phone no": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('phone_no', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}",
+            "no of guest": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('no_of_guest', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "BOOKING_ID",
+              "displayName": "BOOKING_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "time",
+              "displayName": "time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone no",
+              "displayName": "phone no",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "no of guest",
+              "displayName": "no of guest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d8301e23-5079-4761-9b22-1c64417ce1fa",
+      "name": "booking_details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gVn2psDMVfYEPlDo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2402fa5b-1a97-4b6e-800f-8d5005369877",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        352
+      ],
+      "id": "a0c9d748-4945-48e0-82c6-ca3d90bd04e7",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "=91{{ $('Webhook').item.json.body.message.toolCallList[0].function.arguments['Moblie Number'] }}",
+        "textBody": "=👋 Hello {{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.Name }},\n✅ Your table has been successfully booked at Hotel Zapnix!  🧾 Booking Summary:\nBooking ID: {{ $json.BOOKING_ID }} \n📅 Date:{{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.Date }}\n⏰ Time:{{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments.Time }}\n📞 Phone No:{{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments['Moblie Number'] }}\n👥 No. of Guests:{{ $('Webhook').item.json.body.message.toolCalls[0].function.arguments['Number Of Guest'] }} \n📍 We look forward to hosting you with a memorable dining experience.  If you need to make changes or have special requests, just reply here or call us directly.\n🍽 Hotel Zapnix  \n📍 MG Road, Opp. City Mall   \n📞 ‪‪‪+91-98765-43210 ‬‬‬  \nThank you for choosing us! 🙏",
+        "additionalFields": {
+          "previewUrl": false
+        }
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        832,
+        128
+      ],
+      "id": "74fbb5ae-bc64-4770-be98-79edc5676856",
+      "name": "Send message",
+      "webhookId": "1432edfc-d4e3-44ba-abdb-7c1c15b8f8a9",
+      "executeOnce": false,
+      "alwaysOutputData": false,
+      "credentials": {
+        "whatsAppApi": {
+          "id": "52xzBu2siT86AEOD",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1leBNLBaZlWiGBvoX7q3UIwg5kB48KkcKNY8T9y2Botk",
+          "mode": "list",
+          "cachedResultName": "Availability_call_agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1leBNLBaZlWiGBvoX7q3UIwg5kB48KkcKNY8T9y2Botk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1leBNLBaZlWiGBvoX7q3UIwg5kB48KkcKNY8T9y2Botk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Time', ``, 'string') }}",
+            "DATE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('DATE', ``, 'string') }}",
+            "TABLES AVAILABLE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('TABLES_AVAILABLE', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Time"
+          ],
+          "schema": [
+            {
+              "id": "DATE",
+              "displayName": "DATE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TABLES AVAILABLE",
+              "displayName": "TABLES AVAILABLE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        48,
+        16
+      ],
+      "id": "6a9cb860-b442-4d57-afac-421fab58d8b1",
+      "name": "update_availability",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gVn2psDMVfYEPlDo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1leBNLBaZlWiGBvoX7q3UIwg5kB48KkcKNY8T9y2Botk",
+          "mode": "list",
+          "cachedResultName": "Availability_call_agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1leBNLBaZlWiGBvoX7q3UIwg5kB48KkcKNY8T9y2Botk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1leBNLBaZlWiGBvoX7q3UIwg5kB48KkcKNY8T9y2Botk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Time",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        416,
+        16
+      ],
+      "id": "0fd0ce4f-7f69-4bef-8fd6-3dba7ca2c9d5",
+      "name": "check_availability",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gVn2psDMVfYEPlDo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "bookTable",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "d77ab41b-16c2-4042-962e-87381190d5f3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "BOOKING "
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "93c44a4e-044c-4107-9f96-2493401e49d4",
+                    "leftValue": "={{ $json.body.message.toolCalls[0].function.name }}",
+                    "rightValue": "Send_A_Menu",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Menu "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        336
+      ],
+      "id": "b1ff6b23-a453-47c9-975a-267675c9d676",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1y9aLPw8Un5eUQhbqE3IHcccjGFS6fGRI01VDa6wrEeM",
+          "mode": "list",
+          "cachedResultName": "BOOKINGS",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y9aLPw8Un5eUQhbqE3IHcccjGFS6fGRI01VDa6wrEeM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1y9aLPw8Un5eUQhbqE3IHcccjGFS6fGRI01VDa6wrEeM/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "name",
+              "lookupValue": "={{ $('Webhook').item.json.body.message.toolWithToolCallList[0].toolCall.function.arguments.Name }}"
+            },
+            {
+              "lookupColumn": "phone no",
+              "lookupValue": "=91{{ $('Webhook').item.json.body.message.toolWithToolCallList[0].toolCall.function.arguments['Moblie Number'] }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        592,
+        128
+      ],
+      "id": "c3b27f21-2862-4c5f-ae75-437d0bd54558",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gVn2psDMVfYEPlDo",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://drive.google.com/uc?export=download&id=1LneBj6ex5R7_8sEGx7iv1FjJreKIgwm7 ",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -256,
+        544
+      ],
+      "id": "13af3404-6195-4797-87df-3dc0ebbc72fa",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "phoneNumberId": "650469054827029",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        592
+      ],
+      "id": "05d23151-2058-45d2-ac6c-9c4573ea9868",
+      "name": "Upload media",
+      "webhookId": "c352e90d-300f-4bdf-a782-390fd39b0f2d",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "52xzBu2siT86AEOD",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "booking_details": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "update_availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check_availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -1,0 +1,1074 @@
+{
+  "name": "Customer Support",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.translatedText }}\n{{ $('WhatsApp Trigger').item.json.messages[0].text.body }}\n\n",
+        "options": {
+          "systemMessage": "=🌱 System Prompt for WhatsApp Farmer Support AI Agent\n\nRole:\nYou are a Farmer Support Assistant available on WhatsApp. You act as a friendly, patient, and humble digital companion for farmers in Kerala.Your goal is to provide personalized guidance, in simple language, using the farmer’s registered details, weather conditions, and agricultural knowledge documents.\n\nData Access & Context Sources\nget number the from user without country code.\n\nGoogle sheet (Farmer Profile by Phone Number without country code)\n\nAuto-fetch farmer details from the user_profiles table:\n\nname\n\nphone\n\nstate\n\ndistrict\n\nvillage\n\nland_size\n\nsoil_type\n\nirrigation_type\n\ncrops\n\nAlways use these details to personalize advice.\n\nExample: “Hello Naitik 👋, you are growing rubber in Thrissur on 1 acre of clay soil. Let me guide you.”\n\nWeather API\n\nFetch real-time weather for the farmer’s district/village.\n\nUse it for irrigation, spraying, sowing, and harvesting advice.\n\nExample: “🌧 Rain expected in Palakkad tomorrow. Avoid spraying pesticide today.”\n\nKnowledge Documents\n\nFertilization (Nutrient Management): Fertilizer schedules, dosages.\n\nGeneral Process of Farming in Kerala: Local crop practices.\n\nNational_Schemes: Subsidies, PM-Kisan, crop insurance, scheme deadlines.\n\nWeather_and_crop_timing: Crop calendar, when to sow/irrigate/harvest.\n\nAlways simplify responses from documents into farmer-friendly advice.\n\nTone & Style\n\nUse farmer-friendly language (Malayalam / Hindi if farmer speaks, else English).\n\nKeep replies short (2–5 sentences), simple, and action-oriented.\n\nAdd emojis 🌾☀️💧💰 when suitable.\n\nSpeak respectfully: use “Chetta”, “Ji”, or farmer’s name.\n\nNever be robotic or overly technical.\n\nResponse Examples\n\nGreeting:\n“Namaskaram Krish chetta 🌾, I see you are growing pepper in 3–6 acres of loamy soil in Thrissur. How can I help you today?”\n\nWeather-based Advice:\n“💧 Rain is expected in Palakkad tomorrow. Skip irrigation today, and check again tomorrow evening.”\n\nFertilizer Advice:\n“🌱 For rubber trees in 1 acre of clay soil, apply 10 kg organic manure per plant during this season. Mix well and water lightly.”\n\nScheme Info:\n“💰 You are eligible for PM-Kisan Yojana. Farmers with up to 2 hectares of land get ₹6000/year. Apply at pmkisan.gov.in or local Krishi Bhavan.”\n\nRules\ntake the phone number without country code\n\nAlways check Supabase farmer profile before replying.\n\nAlways check weather API before irrigation or spraying advice.\n\nAlways refer to documents for fertilization, schemes, and crop timing.\n\nIf farmer details are missing in Supabase, reply politely:\n“I don’t have your profile yet. Please contact Krishi Sakhi team to register.”\n\nKeep every response practical and empathetic."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        -208
+      ],
+      "id": "5a5c594e-7cd3-430f-803a-5daf7ee13c27",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        16
+      ],
+      "id": "56878aea-dc37-4bbd-8b5e-dcbf5ed0f68f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "failed"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        -288
+      ],
+      "id": "2fb0bf5d-30ed-4f51-b531-45ff09bad78c",
+      "name": "WhatsApp Trigger",
+      "webhookId": "dff0818a-1330-4741-931c-b7e61be174fc",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "2eDMQgCoKtCG7R0E",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        16
+      ],
+      "id": "8d442849-0079-477f-8dd7-4834799cb8f8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b96d8792-409b-40f3-996c-07914265d8b4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3dc268a-4f5f-4405-9d33-c24a35099c52",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1568,
+        -288
+      ],
+      "id": "d0b34e4b-f01d-4f32-bb61-18eff3e2ddba",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v17.0/{{ $json.messages[0].audio.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1280,
+        -432
+      ],
+      "id": "ab8b5a8c-e3be-40bc-917e-991b03b69e12",
+      "name": "Get url",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -992,
+        -432
+      ],
+      "id": "2eab1b72-16ea-43ac-9c28-9113b7ac1c7c",
+      "name": "Download File",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "messageType": "audio",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -432
+      ],
+      "id": "adffc016-835e-4101-9008-e7ca667cc8ad",
+      "name": "Send message",
+      "webhookId": "9089c585-9344-4a61-b6aa-8558993c3125",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -768,
+        -432
+      ],
+      "id": "6d5ced3a-f6c7-416d-ba95-131259edd22a",
+      "name": "Speech to Text",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "options": {
+          "response_format": "aac"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1040,
+        -432
+      ],
+      "id": "93ef5997-9abb-4566-b8b0-3550c5e98360",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b96d8792-409b-40f3-996c-07914265d8b4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3dc268a-4f5f-4405-9d33-c24a35099c52",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        816,
+        -208
+      ],
+      "id": "e20dcdeb-6090-4d81-bb33-ceb78b2fbfef",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}\n{{ $json.translatedText }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        -208
+      ],
+      "id": "457152fc-781a-4a17-94c9-20e221d9f284",
+      "name": "Send message1",
+      "webhookId": "86b42c90-1717-4ea5-a1a7-84fa5d80b580",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1uujWBCbikdVoNGYAa2reOWoGfT-8xuUHjLSGsspsREc/edit?usp=sharing"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        16
+      ],
+      "id": "da51b2d3-0548-4f5c-81f3-d86d7c7756d9",
+      "name": "fertilizers",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "jJTi2Smd0D7utgg0",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/15QU6geu1QQhgJkQ7ILPGwwAJjE3D-HTlsuwS9KDGa1A/edit?usp=sharing",
+        "simple": false
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "904eb290-1b25-41d0-a33f-d07dfcaac14a",
+      "name": "National schemes",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "jJTi2Smd0D7utgg0",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1BKYVLWnOmzDVu8kCPCBP0CPtvasQfM8ooUgaXSE6ytA/edit?usp=sharing"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        16
+      ],
+      "id": "75e3bc93-882f-4012-8cf5-78ddbb56ba0e",
+      "name": "Goverment Schemes",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "jJTi2Smd0D7utgg0",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "=https://docs.google.com/document/d/1tBY-zSOc-ryhh7McIT01iPeVt3ns-rMd/edit",
+        "simple": false
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        96,
+        16
+      ],
+      "id": "b6a465c2-4a98-4aec-a4b6-bcea4839176c",
+      "name": "weather and crop timing",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "teXRWVTkrH3NoLd8",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1sfLfC9GArQz3HpPTHOWctjqAXDkZ2KJnxcFR9ggsgBg/edit?usp=sharing"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        224,
+        16
+      ],
+      "id": "ca7a0f74-ecc0-444a-984f-0d7f65eaa557",
+      "name": "General Process of Farming in Kerala",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "jJTi2Smd0D7utgg0",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        352,
+        16
+      ],
+      "id": "d5ac97eb-de3f-4a4c-8eef-80da5a6dfe27",
+      "name": "current weather",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "0PbZMGj3Jv7rhcKG",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "5DayForecast",
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        480,
+        16
+      ],
+      "id": "e8a16dc1-fe82-4cc2-bcec-a78163875568",
+      "name": "5 Days Forecast of weather",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "0PbZMGj3Jv7rhcKG",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1xbKRC0nWMxdu0tIll11W3wumKwaqUpq0M_ekpD6xLIs",
+          "mode": "list",
+          "cachedResultName": "farmer details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbKRC0nWMxdu0tIll11W3wumKwaqUpq0M_ekpD6xLIs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xbKRC0nWMxdu0tIll11W3wumKwaqUpq0M_ekpD6xLIs/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "phone",
+              "lookupValue": "={{ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        16
+      ],
+      "id": "816d6b4b-05ba-4af8-8946-a4339a42f196",
+      "name": "Get Farmer details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Vfc55LZJsEm2YGIM",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "detect the the language and give output in single word like English , Hindi etc. only give output as English or Malayalam . "
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1344,
+        -144
+      ],
+      "id": "2194f6c5-1fb2-4b2f-8e7a-571fd8911062",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        96
+      ],
+      "id": "68954769-608a-43fc-9d6c-f78e2ba549e8",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "eb1446c4-4881-4e6e-9bc3-bb06abb7b9c8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "English"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bc4e1903-2cd2-4e8c-b488-151e86e630cc",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "Malayalam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Malayalam"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -992,
+        -144
+      ],
+      "id": "0936647d-5518-4c41-b3e4-4942f1e48c17",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}",
+        "translateTo": "en"
+      },
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        -64
+      ],
+      "id": "c3c4d575-789a-4c4f-b33b-4d7362d19f3b",
+      "name": "Translate a language",
+      "credentials": {
+        "googleTranslateOAuth2Api": {
+          "id": "2LgZYEHKVzoqYZl2",
+          "name": "Google Translate account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Basic LLM Chain').item.json.text }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0e3ea267-39b8-4f36-b077-f362fb25b43d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "English"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7865365f-1f3d-4843-a3b6-41ea632e5c66",
+                    "leftValue": "={{ $('Basic LLM Chain').item.json.text }}",
+                    "rightValue": "Malayalam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Malayalam"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1040,
+        -192
+      ],
+      "id": "2497e9da-4b37-4f4c-b5b8-0e88fa57ed2e",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "translateTo": "ml"
+      },
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -112
+      ],
+      "id": "d652020a-7516-46c1-b4b4-f896e4448388",
+      "name": "Translate a language1",
+      "credentials": {
+        "googleTranslateOAuth2Api": {
+          "id": "2LgZYEHKVzoqYZl2",
+          "name": "Google Translate account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get url": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Speech to Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Speech to Text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fertilizers": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "National schemes": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Goverment Schemes": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "weather and crop timing": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "General Process of Farming in Kerala": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "current weather": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5 Days Forecast of weather": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Farmer details": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Translate a language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Translate a language1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language1": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e675d144-37c4-4b35-a1c7-ba799f90c4a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "AoDDnyBAWA8TuBfE",
+  "tags": []
+}

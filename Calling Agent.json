@@ -1,0 +1,762 @@
+{
+  "name": "Calling Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "register-farmer",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        -240
+      ],
+      "id": "513cfb6f-d677-437e-a90f-c2dbab5a4cca",
+      "name": "Webhook",
+      "webhookId": "02d991f9-ab53-4bd9-a0b2-a2ce79ad4013"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eccdb9ec-aab7-446c-b3fd-0dc3fe702fda",
+              "name": "id ",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments.id }}{{ $json.body.id }}",
+              "type": "string"
+            },
+            {
+              "id": "d9d6e18c-c2f8-412d-b58f-068228f56d10",
+              "name": "phone",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments.Phone }}{{ $json.body['phone number'] }}",
+              "type": "string"
+            },
+            {
+              "id": "13896d41-b1a9-47c3-a26a-d68e18a921e4",
+              "name": "user id",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['user id'] }}{{ $json.body['user id'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8a748adf-3b09-46d2-a0f6-b9db37b8ad77",
+              "name": "farm size",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['farm size'] }}{{ $json.body['farm size'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0c46d83e-f232-4c1b-a95e-1d5375428314",
+              "name": "full name ",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['full name'] }}{{ $json.body['full name '] }}",
+              "type": "string"
+            },
+            {
+              "id": "2a230047-bd3d-40a9-b027-ba44dd62c931",
+              "name": "soil type",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['soil type'] }}{{ $json.body['soil type'] }}",
+              "type": "string"
+            },
+            {
+              "id": "ae0b24ac-bdda-4b6a-ad33-6527f76fbea0",
+              "name": "village/district",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['village / district'] }}{{ $json.body['village/district'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -240
+      ],
+      "id": "c93e958c-5770-42d2-abc7-0c7c694e9c4a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "tableId": "farmers",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "id",
+              "fieldValue": "={{ $json['id '] }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $json['user id'] }}"
+            },
+            {
+              "fieldId": "farm_size",
+              "fieldValue": "={{ $json['farm size'] }}"
+            },
+            {
+              "fieldId": "full_name",
+              "fieldValue": "={{ $json['full name '] }}"
+            },
+            {
+              "fieldId": "soil_type",
+              "fieldValue": "={{ $json['soil type'] }}"
+            },
+            {
+              "fieldId": "village_district",
+              "fieldValue": "={{ $json['village/district'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -240
+      ],
+      "id": "b188217e-92f1-4e74-b519-bc91ddc4853b",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YPwS1xHH6Xq485hW",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Register Farmer\n",
+        "height": 240,
+        "width": 912,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "d1cbdfa1-f598-4365-b41d-5c208525c324",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "add-crop",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        176
+      ],
+      "id": "2d8ae041-677b-4838-b280-b44f23930199",
+      "name": "Webhook1",
+      "webhookId": "02d991f9-ab53-4bd9-a0b2-a2ce79ad4013"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eccdb9ec-aab7-446c-b3fd-0dc3fe702fda",
+              "name": "area",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments.area }}{{ $json.body.area }}",
+              "type": "string"
+            },
+            {
+              "id": "d9d6e18c-c2f8-412d-b58f-068228f56d10",
+              "name": "season",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments.season }}{{ $json.body.season }}",
+              "type": "string"
+            },
+            {
+              "id": "13896d41-b1a9-47c3-a26a-d68e18a921e4",
+              "name": "crop type",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['crop type'] }}{{ $json.body.crop_type }}",
+              "type": "string"
+            },
+            {
+              "id": "0c46d83e-f232-4c1b-a95e-1d5375428314",
+              "name": "soil type",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['soil type'] }}{{ $json.body.soil_type }}",
+              "type": "string"
+            },
+            {
+              "id": "2a230047-bd3d-40a9-b027-ba44dd62c931",
+              "name": "irrigation type",
+              "value": "={{ $json.body.message.toolCalls[0].function.arguments['Irrigatin type'] }}{{ $json.body.irrrigation_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        176
+      ],
+      "id": "8fd00d0f-fc83-44d7-8cca-8706cc651590",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "tableId": "add_crop",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "area",
+              "fieldValue": "={{ $json.area }}"
+            },
+            {
+              "fieldId": "season",
+              "fieldValue": "={{ $json.season }}"
+            },
+            {
+              "fieldId": "crop_type",
+              "fieldValue": "={{ $json['crop type'] }}"
+            },
+            {
+              "fieldId": "soil_type",
+              "fieldValue": "={{ $json['soil type'] }}"
+            },
+            {
+              "fieldId": "irrigation_type",
+              "fieldValue": "={{ $json['irrigation type'] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        336,
+        176
+      ],
+      "id": "5c084359-9bac-42e1-a25a-d6a78100aa3b",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YPwS1xHH6Xq485hW",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Add Crop\n",
+        "height": 208,
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "cc16ae49-6e4f-4377-b737-d800c672ec7d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "=add_activity",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        592
+      ],
+      "id": "47d3847b-e0f8-467e-b2cc-8c95204d9029",
+      "name": "Webhook2",
+      "webhookId": "b2f4c6bd-4192-4446-957b-dc9a0d135225"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31b50bb1-d5fb-43dc-aae1-4262bb981138",
+              "name": "crop_type",
+              "value": "={{$json[\"crop_type\"]}}{{ $json.body.crop_type }}",
+              "type": "string"
+            },
+            {
+              "id": "6a74e1ea-b979-4dfe-ac0e-b74af4cb5fba",
+              "name": "activity_type",
+              "value": "={{$json[\"activity_type\"]}}{{ $json.body.activity_type }}",
+              "type": "string"
+            },
+            {
+              "id": "88767ba0-022c-4621-b8d1-7d6f34b914ed",
+              "name": "=description",
+              "value": "={{$json[\"description\"]}}{{ $json.body.description }}",
+              "type": "string"
+            },
+            {
+              "id": "3efdc039-628b-4959-9cce-dcab64ec7b16",
+              "name": "quantity",
+              "value": "={{$json[\"quantity\"]}}{{ $json.body.quantity }}",
+              "type": "number"
+            },
+            {
+              "id": "168176d8-17f5-47fe-aaba-8eb37312305f",
+              "name": "unit",
+              "value": "={{$json[\"unit\"]}}{{ $json.body.unit }}",
+              "type": "string"
+            },
+            {
+              "id": "51196116-295b-445a-834c-fbb6945434ca",
+              "name": "date",
+              "value": "={{$json[\"date\"]}}{{ $json.body.date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        592
+      ],
+      "id": "6d3e0318-38b0-4672-8779-2e2c48a23ebb",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "tableId": "add_activity",
+        "dataToSend": "=defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "crop_type",
+              "fieldValue": "={{ $json.crop_type }}"
+            },
+            {
+              "fieldId": "activity_type",
+              "fieldValue": "={{ $json.activity_type }}"
+            },
+            {
+              "fieldId": "=description",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "=quantity",
+              "fieldValue": "={{ $json.quantity }}"
+            },
+            {
+              "fieldId": "=unit",
+              "fieldValue": "={{ $json.unit }}"
+            },
+            {
+              "fieldId": "=date",
+              "fieldValue": "={{ $json.date }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        336,
+        592
+      ],
+      "id": "7977eea1-6964-49f7-a23e-df1c4cf15ee4",
+      "name": "Create a row2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YPwS1xHH6Xq485hW",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Add Activity",
+        "height": 224,
+        "width": 1040
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        528
+      ],
+      "id": "d7c7d14f-3f3e-4ef7-9ce8-2cd6f34bd06c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"success\"\n        }\n    ]\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        -144
+      ],
+      "id": "f4753b97-4d44-4564-91fa-9e0d57f438be",
+      "name": "Respond to Vapi"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a57a0070-d360-4cb3-bae1-771dd5e9ae9c",
+              "leftValue": "={{ $('Webhook').item.json.body.type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -240
+      ],
+      "id": "0e35e738-5749-4436-859b-5a44df43ed7b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"successfully register\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        -336
+      ],
+      "id": "301e710b-e9b6-4de0-83ea-467691eac713",
+      "name": "Respond to Whatsapp"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05d02a5c-d7e2-4a7f-baf0-76aa225d7f6f",
+              "leftValue": "={{ $('Webhook1').item.json.body.type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        176
+      ],
+      "id": "5885de01-3de0-4e9c-96fd-992572c920c6",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook1').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"success\"\n        }\n    ]\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        272
+      ],
+      "id": "ff69a55d-07cf-4454-8ab3-0fe6a1416374",
+      "name": "Respond to Vapi1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"successfully crop added\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        80
+      ],
+      "id": "272d7556-5431-4eb9-a617-00ef3e314105",
+      "name": "Respond to whatsapp"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7309f9b6-dccf-4bd2-9b44-f9ec0742f908",
+              "leftValue": "={{ $('Webhook2').item.json.body.type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        592
+      ],
+      "id": "ebd51c27-7efe-4f32-845a-dc664f5960d8",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook1').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"success\"\n        }\n    ]\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        688
+      ],
+      "id": "c6a8b690-c5d3-446b-88d7-86eef93ebc86",
+      "name": "Respond to Vapi2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"successfully activity added\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        496
+      ],
+      "id": "19101acb-c2c6-4ef7-98be-b68d0810c17a",
+      "name": "Respond to Whatsapp1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Create a row2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Vapi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Respond to whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Vapi1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Whatsapp1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Vapi2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "533efb00-1165-4d7b-9da0-e4a9fcc21ae0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "zeGvOvVFI5EIEoxb",
+  "tags": []
+}

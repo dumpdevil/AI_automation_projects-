@@ -1,0 +1,254 @@
+{
+  "name": "weather-api",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "weather-api",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "0c4560ab-c885-4497-9e69-4c0cd94eebfe",
+      "name": "Webhook",
+      "webhookId": "5b5d5bcb-29b7-4c51-bc32-08ef41546db3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8b452def-b02b-4674-9cdb-d9042e419c4c",
+              "name": "city",
+              "value": "={{ $json.body.user.location.village }}",
+              "type": "string"
+            },
+            {
+              "id": "8ab0f5fb-1ed7-40ce-b9ca-8a22ad022428",
+              "name": "state",
+              "value": "={{ $json.body.user.location.village }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "71af0623-6f3a-4672-ae8a-15e3fcab0684",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.city }},{{ $json.state }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a weather and farming assistant for farmers in Kerala.\n\nWhen you receive real-time weather data for a location, generate a clear and concise report in this format:\n\n🌦️ Weather for <Location>:  \n- Temperature: <temperature>°C  \n- Humidity: <humidity>%  \n- Wind Speed: <wind speed> km/h  \n- Visibility: <visibility> km  \n- 🌾 Farm Advisory: <one-line practical advice>\n\nUse the weather condition to decide the advisory. For example:\n- If rain or storms: \"Avoid pesticide spraying today.\"\n- If it's very hot: \"Irrigate crops early to reduce evaporation.\"\n- If it's cloudy or cool: \"Suitable weather for field work.\"\n- If very windy: \"Protect lightweight plants or covers.\"\n\nKeep the response short, factual, and useful. Only use the data provided. Don’t make up extra weather details.\n\noutput format in json:-\nexample\n{\n  \"temperature\": 28.5,\n  \"condition\": \"Partly cloudy\",\n  \"humidity\": 75,\n  \"windSpeed\": 12,\n  \"visibility\": 5,\n  \"forecast\": [\n    {\n      \"dt\": \"2024-10-27T14:00:00Z\",\n      \"temperature\": 29,\n      \"condition\": \"Partly cloudy\"\n    }\n  ]\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9cf227f8-4c1a-42ac-bd5b-3e7b5fd5c6c1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        224
+      ],
+      "id": "2d8877ce-c302-449c-9bf0-ba244c8e5e9a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"temperature\": 28.5,\n  \"condition\": \"Partly cloudy\",\n  \"humidity\": 75,\n  \"windSpeed\": 12,\n  \"visibility\": 5,\n  \"forecast\": [\n    {\n      \"dt\": \"2024-10-27T14:00:00Z\",\n      \"temperature\": 29,\n      \"condition\": \"Partly cloudy\"\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        224
+      ],
+      "id": "a9fdf19e-5a53-4ac9-9abb-37a410a1d400",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"temperature\":{{ $json.output.temperature }} ,\n  \"condition\": \"{{ $json.output.condition }}\",\n  \"humidity\":{{ $json.output.humidity }} ,\n  \"windSpeed\": {{ $json.output.windSpeed }},\n  \"visibility\": {{ $json.output.visibility }},\n  \"forecast\": [\n    {\n      \"dt\": \"{{ $json.output.forecast[0].dt }}\",\n      \"temperature\": {{ $json.output.forecast[0].temperature }},\n      \"condition\": \"{{ $json.output.forecast[0].condition }}\"\n    }\n  ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        768,
+        0
+      ],
+      "id": "5a77ddcd-f60d-48e3-8913-46a7f0f231a7",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "operation": "5DayForecast",
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        352,
+        224
+      ],
+      "id": "07d3bc10-ee17-47ff-b277-38968055b9ca",
+      "name": "future forecasting",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "0PbZMGj3Jv7rhcKG",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        528,
+        224
+      ],
+      "id": "71273b88-c061-4bb8-8ceb-f0e210dc593b",
+      "name": "current weather",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "0PbZMGj3Jv7rhcKG",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "future forecasting": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "current weather": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a3295988-b260-4ad0-84ca-0e6aacbbfc9f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "QBPoeuEIo2UWO4ht",
+  "tags": []
+}

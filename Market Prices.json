@@ -1,0 +1,175 @@
+{
+  "name": "Market Prices",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://vegetablemarketprice.com/market/kerala/today",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -32
+      ],
+      "id": "cc04047d-5be9-471e-8158-6806b3bf1723",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Onion Big",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=format this in structured output\ni want only user entered data from the whole data\nthe whole data is : {{ $json.data }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -32
+      ],
+      "id": "9814fe6e-4a24-463a-9b71-e597b76a09d1",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"Vegetable\": \"Onion Big\",\n    \"Wholesale Price\": \"₹25\",\n    \"Retail Price\": \"29 - 32\",\n    \"Shopping Mall\": \"30 - 41\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Onion Small\",\n    \"Wholesale Price\": \"₹46\",\n    \"Retail Price\": \"53 - 58\",\n    \"Shopping Mall\": \"55 - 76\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Tomato\",\n    \"Wholesale Price\": \"₹26\",\n    \"Retail Price\": \"30 - 33\",\n    \"Shopping Mall\": \"31 - 43\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Green Chilli\",\n    \"Wholesale Price\": \"₹43\",\n    \"Retail Price\": \"49 - 55\",\n    \"Shopping Mall\": \"52 - 71\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Beetroot\",\n    \"Wholesale Price\": \"₹37\",\n    \"Retail Price\": \"43 - 47\",\n    \"Shopping Mall\": \"44 - 61\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Potato\",\n    \"Wholesale Price\": \"₹25\",\n    \"Retail Price\": \"29 - 32\",\n    \"Shopping Mall\": \"30 - 41\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Raw Banana (Plantain)\",\n    \"Wholesale Price\": \"₹8\",\n    \"Retail Price\": \"9 - 10\",\n    \"Shopping Mall\": \"10 - 13\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Amaranth Leaves\",\n    \"Wholesale Price\": \"₹15\",\n    \"Retail Price\": \"17 - 19\",\n    \"Shopping Mall\": \"18 - 25\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Amla\",\n    \"Wholesale Price\": \"₹75\",\n    \"Retail Price\": \"86 - 95\",\n    \"Shopping Mall\": \"90 - 124\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Ash gourd\",\n    \"Wholesale Price\": \"₹21\",\n    \"Retail Price\": \"24 - 27\",\n    \"Shopping Mall\": \"25 - 35\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Baby Corn\",\n    \"Wholesale Price\": \"₹47\",\n    \"Retail Price\": \"54 - 60\",\n    \"Shopping Mall\": \"56 - 78\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Banana Flower\",\n    \"Wholesale Price\": \"₹18\",\n    \"Retail Price\": \"21 - 23\",\n    \"Shopping Mall\": \"22 - 30\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Capsicum\",\n    \"Wholesale Price\": \"₹46\",\n    \"Retail Price\": \"53 - 58\",\n    \"Shopping Mall\": \"55 - 76\",\n    \"Units\": \"1kg\"\n  },\n  {\n    \"Vegetable\": \"Bitter Gourd\",\n    \"Wholesale Price\": \"₹34\",\n    \"Retail Price\": \"39 - 43\",\n    \"Shopping Mall\": \"41 - 56\",\n    \"Units\": \"1kg\"\n  }\n]\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        672,
+        176
+      ],
+      "id": "7aeccc1b-8d2b-48b0-8f62-f2e23fba8528",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        192
+      ],
+      "id": "5f51e6af-d5ed-4dff-99e2-f7e7cc086c10",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "market-prices",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -32
+      ],
+      "id": "48a92abc-bbe4-42d8-a0e2-7d5e81d82b2a",
+      "name": "Webhook",
+      "webhookId": "7ce3a37e-5edb-48ef-8891-3634cc54e9c5"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Vegetable : {{ $json.output[0].Vegetable }} , wholesale price : {{ $json.output[0]['Wholesale Price'] }}, retail price :{{ $json.output[0]['Retail Price'] }} , shopping mall : {{ $json.output[0]['Shopping Mall'] }}, units:{{ $json.output[0].Units }} \"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        800,
+        -32
+      ],
+      "id": "04e909a5-c88d-4314-a7e8-e5346773b8ba",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5bcead72-83e8-4e47-a4d7-0cfafa278e8e",
+  "meta": {
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "X5VlryH17WAFYisE",
+  "tags": []
+}

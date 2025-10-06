@@ -1,0 +1,410 @@
+{
+  "name": "alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1104,
+        -16
+      ],
+      "id": "8fc0f855-16cb-42fb-b421-953cc0b07639",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fbdcffe1-1c8f-48c8-8d57-25f1cc7ca8e9",
+              "leftValue": "{{$json[\"weather\"][0][\"main\"]}}",
+              "rightValue": "Rain",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "dba0a42e-8af7-4bda-b4f7-523861ac03ea",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        0
+      ],
+      "id": "5469909f-67fa-4c16-b6ac-b143610a820b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Place }}",
+        "options": {
+          "systemMessage": "=You are an AI assistant for a farmer. The current weather is {{ $json.weather[0].description }}. The temperature is {{ $json.main.temp }}°C and it feels like {{ $json.main.feels_like }}°C. The wind speed is {{ $json.wind.speed }} m/s and humidity is {{ $json.main.humidity }}%. There is a high chance of rain today. Based on this information, write a short, clear, and actionable WhatsApp message for a farmer. Advise them on what to do for their crops. Keep the tone friendly and direct. The message should start with a relevant emoji and a clear alert title.\nYou are an AI assistant for a farmer. The current weather is {{ $json.weather[0].description }}. The temperature is {{ $json.main.temp }}°C, and it feels like {{ $json.main.feels_like }}°C. The wind speed is {{ $json.wind.speed }} m/s and humidity is {{ $json.main.humidity }}%. There is no major weather event expected. Based on this, write a short, clear, and positive WhatsApp message for a farmer. The message should give them confidence to proceed with normal farming activities. The tone should be friendly and encouraging. The message should start with a relevant emoji and a positive title."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        -16
+      ],
+      "id": "85d7e8de-c20c-4d8f-a9b1-3671ad7ada77",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d78f4914-93cb-483e-812b-2ac4ac2d89f5",
+              "name": "Place",
+              "value": "Ahmedabad",
+              "type": "string"
+            },
+            {
+              "id": "3ecf6232-78d4-4ea3-9fb6-98e74df6eac2",
+              "name": "Language ",
+              "value": "English",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -880,
+        -16
+      ],
+      "id": "57f5a539-8eab-4eba-ae9f-5f8b47871ed1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -656,
+        208
+      ],
+      "id": "c6285746-0de2-44e7-bc1a-0fe3e602a339",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('City', ``, 'string') }}",
+        "language": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Language', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        208
+      ],
+      "id": "fb052191-0634-4268-a0dd-e20524d917fc",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "0PbZMGj3Jv7rhcKG",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "918347741463",
+        "textBody": "=🌧️ Weather Alert 🌧️  \n\n⚠️ Heavy rain expected today in your area.  \n➡️ Protect your crops from waterlogging.  \n➡️ Store harvested grains in a safe, dry place.  \n➡️ Avoid applying fertilizers or pesticides during rain.  \n\nStay safe 🌾",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -112
+      ],
+      "id": "90ff4c54-0457-4de3-bbf4-5fc5fc44a964",
+      "name": "Send message",
+      "webhookId": "fe462f9a-8191-42b3-a271-f4ab01aeb59d",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "918347741463",
+        "textBody": "=\n\n☀️ Clear Weather Forecast! Great day for farming activities. Proceed with your work as planned.\n\n\n\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        368,
+        80
+      ],
+      "id": "4cbccdea-ce32-41ad-9851-d6f5ec3de024",
+      "name": "Send message1",
+      "webhookId": "5e13e877-46f8-42a6-a2a1-a74a348407f1",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json['Language '] }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "d713bf3b-eef7-45e6-876a-6cebcb226e2e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "English"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "31d3e482-85d7-4501-966e-d10183988f4b",
+                    "leftValue": "={{ $('Edit Fields').item.json['Language '] }}",
+                    "rightValue": "Malyalam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Malyalam"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -304,
+        -16
+      ],
+      "id": "6e553e0b-461b-41a6-9aae-5d141d3ca09f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "text": "hiii",
+        "translateTo": "ml"
+      },
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "c87d4563-caf3-4485-b9f4-97530a164cd8",
+      "name": "Translate a language",
+      "credentials": {
+        "googleTranslateOAuth2Api": {
+          "id": "2LgZYEHKVzoqYZl2",
+          "name": "Google Translate account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Translate a language",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b69d2b7b-720a-42ec-815b-799b12e7786a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "m2QS1OSieSAkCHAv",
+  "tags": []
+}

@@ -1,0 +1,1130 @@
+{
+  "name": "customer support agent 2",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.translatedText }}\n{{ $('WhatsApp Trigger').item.json.messages[0].text.body }}\n\n",
+        "options": {
+          "systemMessage": "=[Identity]\n\nYou are Krishi Sakhi, a dedicated and knowledgeable personal WhatsApp assistant for farmers, skilled in providing expert support for managing their agricultural activities. Equipped with a deep understanding of farming and agricultural practices, you deliver assistance with patience and empathy to ensure every farmer gets the help they need.\n\n[Style]\n\nUse a warm, supportive, and friendly tone that makes farmers feel valued and understood.\n\nCommunicate in short, clear WhatsApp messages, using simple and conversational language.\n\nUse emojis 🌱👩‍🌾🚜 when appropriate, to make the conversation engaging and farmer-friendly.\n\n[Response Guidelines]\n\nBreak down steps into easy-to-grasp, short messages instead of long paragraphs.\n\nWait for the farmer’s reply before moving to the next step.\n\nConfirm every important detail shared by the farmer to avoid mistakes.\n\nAvoid industry jargon; always use straightforward and simple words.\n\nWrite numbers in a natural style (e.g., \"five acres\" instead of \"5 acres\").\n\n[Task & Goals]\n1. Start of Chat\n\nWarmly greet the farmer.\n\nAsk politely if they are new or already registered.\n\n2. If Farmer is New (Registration Flow)\n\nStep 1: Ask them to enter their phone number.\n\nStep 2: Send OTP → use tool [sendotp].\n\nStep 3: Ask them to enter the OTP → verify with use tool [verifyotp].\n\nStep 4: Collect details one by one:\n\nFull Name\n\nVillage/District\n\nFarm Size (in acres)\n\nSoil Type\n\nStep 5: Save their details → [Register-farmer].\n\nStep 6: Confirm registration ✅ and introduce them to the Main Menu.\n\n3. If Farmer is Already Registered (Login Flow)\n\nStep 1: Ask for phone number.\n\nStep 2: Send OTP → use tool [sendotp].\n\nStep 3: Ask them to enter OTP → use tool [verifyotp].\n\nStep 4: Confirm successful login and show the Main Menu.\n\n4. Main Menu Options (Show one option at a time for clarity)\n\n🌾 Add Crop\n\n📋 Add Activity\n\n💰 Market Prices\n\n🏛️ Government Schemes\n\n📚 Knowledge Hub\n\n📊 Crop Management\n\n(Pause after showing the list and wait for the farmer’s choice.)\n\n5. Add Crop Flow\n\nAsk crop details step by step:\n\nCrop Type\n\nArea of land\n\nSeason\n\nSoil Type\n\nIrrigation Method\n\nSave details → [add crop].\n\nConfirm success and thank the farmer 🌱.\n\n6. Add Activity Flow\n\nShow farmer their registered crops.\n\nAsk which crop they want to add an activity for.\n\nCollect activity details:\n\nType of activity (e.g., sowing, fertilizing, irrigation)\n\nScheduled date\n\nSave details and confirm ✅.\n\n7. Market Prices Flow\n\nShare real-time local market prices for selected crops.\n\nSend in a simple table format or bullet list.\n\nAsk if they want more details or another crop’s price.\n\n8. Schemes Flow\n\nSuggest government schemes relevant to their village, farm size, and crops.\n\nExplain each scheme in simple, short sentences.\n\nOffer a “Read More” option for full details.\n\n9. Knowledge Hub\n\nShare short and clear tips about:\n\nBest farming practices 🌱\n\nWeather forecasts 🌦️\n\nFertilizer use and dosages\n\nKeep advice practical and farmer-friendly.\n\n10. Crop Management / Tracking\n\nShow farmer their crop progress in simple messages.\n\nList growth stages and recent activities.\n\nGive practical next steps: irrigation, fertilizer, or pest control advice.\n\n[Error Handling / Fallback]\n\nIf the farmer’s reply is unclear, politely ask them again.\n\nIf any process fails, apologize briefly and try again.\n\nIf repeated errors occur, suggest: “Would you like me to connect you to human support for better help?”\n\n[Rules for the WhatsApp Agent]\n\nSend one short message at a time (avoid big blocks of text).\n\nAlways confirm farmer details before saving.\n\nWait for the farmer’s reply before moving to the next step.\n\nUse the defined tools: [sendotp], [verifyotp], [Register-farmer], [add crop].\n\nKeep messages friendly, clear, and easy to read.\n\n\noutput format \ngive output in english only"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        224
+      ],
+      "id": "2a1064cd-dea6-4309-88ba-1821dac78640",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        736,
+        448
+      ],
+      "id": "c98d53f3-482a-4adc-bd51-28f2fc4ab6c3",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {
+          "messageStatusUpdates": [
+            "failed"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        160
+      ],
+      "id": "1d3755a8-7cef-463a-9184-120f584b66ad",
+      "name": "WhatsApp Trigger",
+      "webhookId": "dff0818a-1330-4741-931c-b7e61be174fc",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "2eDMQgCoKtCG7R0E",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        448
+      ],
+      "id": "3e594f68-78e8-4595-9551-c59cf5e37567",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b96d8792-409b-40f3-996c-07914265d8b4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3dc268a-4f5f-4405-9d33-c24a35099c52",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -288,
+        160
+      ],
+      "id": "7073380a-5771-43dc-8e09-b7c6ebd7c273",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v17.0/{{ $json.messages[0].audio.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4832b770-5928-4e48-8c78-429bbf0d5231",
+      "name": "Get url",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "48df1766-c1be-4590-bee5-e0bfb584a0b5",
+      "name": "Download File",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "messageType": "audio",
+        "mediaPath": "useMedian8n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        16
+      ],
+      "id": "4786d164-41c7-4c3b-b7ff-96e47488321b",
+      "name": "Send message",
+      "webhookId": "9089c585-9344-4a61-b6aa-8558993c3125",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        512,
+        0
+      ],
+      "id": "6bc611ab-f805-4eb0-94ec-23d2eb3ef023",
+      "name": "Speech to Text",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "options": {
+          "response_format": "aac"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2192,
+        16
+      ],
+      "id": "5df0b10e-f90b-42f5-82b8-c99d43d26fba",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b96d8792-409b-40f3-996c-07914265d8b4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b3dc268a-4f5f-4405-9d33-c24a35099c52",
+                    "leftValue": "={{ $('WhatsApp Trigger').item.json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1968,
+        224
+      ],
+      "id": "0e2476e2-639d-430b-8ec7-b51ba5fa97e4",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "650469054827029",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}\n{{ $json.translatedText }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        256
+      ],
+      "id": "9df4ce60-6d12-468d-a8b7-e93e605e9d64",
+      "name": "Send message1",
+      "webhookId": "86b42c90-1717-4ea5-a1a7-84fa5d80b580",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "WpIefLnSpeUzZ22f",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "detect the the language and give output in single word like English , Hindi etc. only give output as English or Malayalam . only understand the input language alphabets. example : Pullu {it is English} , പുല്ലു {it is malyalam}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -64,
+        304
+      ],
+      "id": "5e98626a-25d7-4f6b-a98e-9c6aa53dffe3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        528
+      ],
+      "id": "73dfd8e7-cfc0-4d73-bd6a-45290d4cad90",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "1O6vrpDvlA9zJQp2",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "eb1446c4-4881-4e6e-9bc3-bb06abb7b9c8"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "English"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bc4e1903-2cd2-4e8c-b488-151e86e630cc",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "Malayalam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Malayalam"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        288,
+        304
+      ],
+      "id": "cd1d5ba2-1313-4220-8c21-22cdfb641b78",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}",
+        "translateTo": "en"
+      },
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        512,
+        368
+      ],
+      "id": "81f50ff9-0818-4b18-98b0-5f62a9079696",
+      "name": "Translate a language",
+      "credentials": {
+        "googleTranslateOAuth2Api": {
+          "id": "2LgZYEHKVzoqYZl2",
+          "name": "Google Translate account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Basic LLM Chain').item.json.text }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0e3ea267-39b8-4f36-b077-f362fb25b43d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "English"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7865365f-1f3d-4843-a3b6-41ea632e5c66",
+                    "leftValue": "={{ $('Basic LLM Chain').item.json.text }}",
+                    "rightValue": "Malayalam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Malayalam"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2192,
+        256
+      ],
+      "id": "3e40f32e-71d4-4493-80ce-05d578ad4d46",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "translateTo": "ml"
+      },
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        2416,
+        320
+      ],
+      "id": "9037daf1-1a89-4df3-acd9-d2f08b2dd1d5",
+      "name": "Translate a language1",
+      "credentials": {
+        "googleTranslateOAuth2Api": {
+          "id": "2LgZYEHKVzoqYZl2",
+          "name": "Google Translate account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to send otp to user entered phone number",
+        "method": "POST",
+        "url": "https://teamvisinory01.app.n8n.cloud/webhook/send-otp",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone number",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `the phone number entered by user `, 'string') }}"
+            },
+            {
+              "name": "type",
+              "value": "Whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        992,
+        448
+      ],
+      "id": "e2858df1-00a7-4fc2-a50f-8f8c7a4f5c33",
+      "name": "send-otp"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://teamvisinory01.app.n8n.cloud/webhook/verify-otp",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone number",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `phone number of user`, 'string') }}"
+            },
+            {
+              "name": "OTP",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `otp entered by user`, 'string') }}"
+            },
+            {
+              "name": "type",
+              "value": "Whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        448
+      ],
+      "id": "98fca9de-e5f8-41a9-aaa5-ae5680250048",
+      "name": "verify-otp"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool to save farmer details",
+        "method": "POST",
+        "url": "https://teamvisinory01.app.n8n.cloud/webhook/register-farmer",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `generate a random id like {b1e4e5b1-5c7e-4b0c-9e2b-3c6f8b2e3f7f} . it should be always unique`, 'string') }}"
+            },
+            {
+              "name": "phone number",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `phone number of user`, 'string') }}"
+            },
+            {
+              "name": "user id",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', `generate a random user id like {c1e4e5b1-5c7e-4b0c-9e2b-3c6f8b2e3f8f} . it should be always unique`, 'string') }}"
+            },
+            {
+              "name": "farm size",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', ``, 'string') }}"
+            },
+            {
+              "name": "full name ",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', ``, 'string') }}"
+            },
+            {
+              "name": "soil type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters5_Value', ``, 'string') }}"
+            },
+            {
+              "name": "village/district",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters6_Value', ``, 'string') }}"
+            },
+            {
+              "name": "type",
+              "value": "whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1248,
+        448
+      ],
+      "id": "7ff604af-efeb-4032-b13d-b3e8d28d57ec",
+      "name": "Register Farmer"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use this tool to add crop of farmer to database",
+        "method": "POST",
+        "url": "https://teamvisinory01.app.n8n.cloud/webhook/add-crop",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "area",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `area to add crop`, 'string') }}"
+            },
+            {
+              "name": "season",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `season of crop`, 'string') }}"
+            },
+            {
+              "name": "crop_type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', `type of crop`, 'string') }}"
+            },
+            {
+              "name": "soil_type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', `type of soil`, 'string') }}"
+            },
+            {
+              "name": "irrrigation_type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', `type of irrigation`, 'string') }}"
+            },
+            {
+              "name": "type",
+              "value": "whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1376,
+        448
+      ],
+      "id": "87b3fa5f-a69f-4242-b829-2f6ed47f6631",
+      "name": "Add Crop"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://teamvisinory01.app.n8n.cloud/webhook/add_activity",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "crop_type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `type of crop`, 'string') }}"
+            },
+            {
+              "name": "activity_type",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `type of activity`, 'string') }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', `description of activity`, 'string') }}"
+            },
+            {
+              "name": "quantity",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', `quantity of activity`, 'string') }}"
+            },
+            {
+              "name": "unit",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', `unit of activity`, 'string') }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters5_Value', `date of activity`, 'string') }}"
+            },
+            {
+              "name": "type",
+              "value": "whatsapp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        448
+      ],
+      "id": "b70ce5c4-5afe-41c4-b9e2-db3830118a4e",
+      "name": "add activity"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/15QU6geu1QQhgJkQ7ILPGwwAJjE3D-HTlsuwS9KDGa1A/edit?usp=sharing"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        448
+      ],
+      "id": "f2a63543-2588-4385-ab37-63063ce788af",
+      "name": "National & Goverment Schemes",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "teXRWVTkrH3NoLd8",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "get the market prices",
+        "method": "POST",
+        "url": "https://teamvisinory01.app.n8n.cloud/webhook/market-prices",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Vegetable",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        448
+      ],
+      "id": "339e9ef4-2756-4c7c-91bb-b0dbea298ae7",
+      "name": "Market Price"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get url": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Speech to Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Speech to Text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Translate a language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Translate a language1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language1": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-otp": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "verify-otp": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Farmer": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Crop": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add activity": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "National & Goverment Schemes": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Market Price": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2918a468-ee05-4ff5-aa13-8e5ca2c2584f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "WYkusfHTk9v71ASp",
+  "tags": []
+}

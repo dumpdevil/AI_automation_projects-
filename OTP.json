@@ -1,0 +1,551 @@
+{
+  "name": "OTP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        -32
+      ],
+      "id": "9fb0e085-c004-45d8-ab72-578e91f5c057",
+      "name": "Webhook",
+      "webhookId": "66a89784-a3a7-4a7d-8a74-55a4f5ff77b7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const otp = Math.floor(100000 + Math.random() * 900000).toString();\nreturn [{\n  json: {\n    phone_number:$input.first().json.query['phone number'] ,\n    otp: otp,\n    expires_at: new Date(Date.now() + 5*60*1000).toISOString() // 5 min expiry\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        -32
+      ],
+      "id": "e694bdcf-b1f9-452f-92df-989d01e17e41",
+      "name": "Generate otp"
+    },
+    {
+      "parameters": {
+        "tableId": "OTP",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Phone number",
+              "fieldValue": "={{ $('Webhook').item.json.body['phone number'] }}\n{{ $json.body.message.toolWithToolCallList[0].toolCall.function.arguments['phone number'] }}"
+            },
+            {
+              "fieldId": "otp",
+              "fieldValue": "={{ $json.otp }}"
+            },
+            {
+              "fieldId": "expires_at",
+              "fieldValue": "={{ $json.expires_at }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -32
+      ],
+      "id": "9856e8b8-e4f4-44b1-8539-79f57ff14711",
+      "name": "store-otp",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YPwS1xHH6Xq485hW",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+19496937211",
+        "to": "=+91{{ $json['Phone number'] }}",
+        "message": "=Your Krishi sakhi verification code is {{ $json.otp }}. It expires in 5 minutes.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -32
+      ],
+      "id": "e13a0090-939f-48c0-b4ad-5b9b1ad61ffc",
+      "name": "send-otp",
+      "credentials": {
+        "twilioApi": {
+          "id": "MOPQFqt5vDBPpUwz",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Send OTP",
+        "height": 368,
+        "width": 1296,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "4d728801-2fa3-4934-8888-157e149c43f9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verify-otp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        368
+      ],
+      "id": "5cf4de65-9dcf-4a16-a163-0479fa16165e",
+      "name": "Webhook1",
+      "webhookId": "2e85fe00-6194-4aff-93af-443537c73d3a"
+    },
+    {
+      "parameters": {
+        "content": "Verify OTP",
+        "height": 656,
+        "width": 1296,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -304,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "e8ca84d2-3261-44c2-aa67-d381466141fb",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "OTP",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Phone number",
+              "keyValue": "={{ $json.body.message.toolWithToolCallList[0].toolCall.function.arguments['phone number'] }}\n{{ $json.body['phone number'] }}"
+            },
+            {
+              "keyName": "otp",
+              "keyValue": "={{ $json.body.message.toolWithToolCallList[0].toolCall.function.arguments.OTP }}\n{{ $json.body.OTP }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        368
+      ],
+      "id": "73c2ebc6-6e53-4ef2-85d2-83b4e07ebeab",
+      "name": "Match OTP",
+      "credentials": {
+        "supabaseApi": {
+          "id": "YPwS1xHH6Xq485hW",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"success\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        768,
+        48
+      ],
+      "id": "c000eacb-36fa-49e6-a822-27ae6bc508eb",
+      "name": "Respond to VAPI"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1fb5819c-7269-47c0-8b66-9c0044f7b57c",
+              "leftValue": "={{ $('Webhook').item.json.body.type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        -32
+      ],
+      "id": "b7c294bb-aff4-4fb6-8203-ebb88d9950c4",
+      "name": "if"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"OTP sent successfully\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        768,
+        -144
+      ],
+      "id": "dcce273c-5edc-4078-8689-6606b49aaf7d",
+      "name": "Respond to N8N"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook1').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"Verified\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        640,
+        384
+      ],
+      "id": "a58d1cca-8aa9-4e4d-a7c4-c724d8143877",
+      "name": "Valid OTP for VAPI"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n    \"results\": [\n        {\n            \"toolCallId\": \"{{ $('Webhook1').item.json.body.message.toolCalls[0].id }}\",\n            \"result\": \"Invalid OTP. Try Again\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        656,
+        784
+      ],
+      "id": "ee4d45c6-0e62-467d-abdc-0098bb53659f",
+      "name": "Invalid OTP for VAPI"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d7570044-27db-429d-9009-ffd31fb0f3d5",
+              "leftValue": "={{ $json['Phone number'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        368
+      ],
+      "id": "00a81baf-dcef-4993-906c-e317ac0124c3",
+      "name": "Match or NOT"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97be03d9-6588-46e6-b647-05795e46d83f",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        272
+      ],
+      "id": "f21bca64-4a23-444f-908a-8b8c2136267c",
+      "name": "Vapi or N8N"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"OTP verified successfully\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        640,
+        240
+      ],
+      "id": "e7dbdb4d-1468-4994-be82-92651a1329ad",
+      "name": "Valid OTP for N8N"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3937826b-046d-467b-8d07-5f82db81ed8d",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        672
+      ],
+      "id": "cc071cb0-c35d-4db5-bc18-682a4930133f",
+      "name": "Vapi or N8N2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\": \"Invalid OTP\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        656,
+        592
+      ],
+      "id": "102ff73e-427e-48dc-a34a-54bfce6e7924",
+      "name": "Invalid OTP for N8N"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Generate otp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate otp": {
+      "main": [
+        [
+          {
+            "node": "store-otp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "store-otp": {
+      "main": [
+        [
+          {
+            "node": "send-otp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-otp": {
+      "main": [
+        [
+          {
+            "node": "if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Match OTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match OTP": {
+      "main": [
+        [
+          {
+            "node": "Match or NOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if": {
+      "main": [
+        [
+          {
+            "node": "Respond to N8N",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to VAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match or NOT": {
+      "main": [
+        [
+          {
+            "node": "Vapi or N8N",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Vapi or N8N2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vapi or N8N": {
+      "main": [
+        [
+          {
+            "node": "Valid OTP for N8N",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Valid OTP for VAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vapi or N8N2": {
+      "main": [
+        [
+          {
+            "node": "Invalid OTP for N8N",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid OTP for VAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b3fe48af-f61d-42ec-a004-d5603cbdb963",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90a8b37fc24bc479c0b92983aa707be417a147aca5324935b55176184ae51ab1"
+  },
+  "id": "PuCoR9lGyV6i6C7Q",
+  "tags": []
+}
